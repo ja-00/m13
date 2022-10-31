@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.Toast;
-
+/**
+ * Clase que crea el dashboard del usuario admin
+ */
 public class DashAdmin extends AppCompatActivity {
 
     @Override
@@ -17,19 +19,27 @@ public class DashAdmin extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Kebook");
     }
-
+    /**
+     * Menú para el dashboard
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
-
+    /**
+     * Si se pulsa el botón de Atràs en el teléfono
+     */
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
         showExitDialog();
     }
-
+    /**
+     * Cuadro de aviso al pulsar el botón de Atrás del tele´fono
+     */
     private void showExitDialog(){
         AlertDialog.Builder builder;
         builder = new AlertDialog.Builder(this);

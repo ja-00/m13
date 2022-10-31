@@ -7,7 +7,18 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * Clase Login asíncrona que trabaja en segundo plano.
+ * Toma valores de entrada Usuario y password y los pasa a la clase que gestiona la conexión, NetworkUtils
+ */
 public class Login extends AsyncTask<String, Void, String> {
+
+    /**
+     *
+     * @param strings
+     * @return
+     * Mètodo
+     */
 
 /*    private WeakReference<EditText> mUser;
     private WeakReference<EditText> mPass;*/

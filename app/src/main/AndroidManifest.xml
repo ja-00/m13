@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kebook"
         android:usesCleartextTraffic="true">
-        <activity android:name=".DashAdmin"></activity>
+        <activity android:name=".Registre"></activity>
+        <activity android:name=".DashAdmin" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
