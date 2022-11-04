@@ -1,25 +1,31 @@
 <resources>
     <string name="app_name">kebook</string>
+    <!--Pantalla login-->
     <string name="input_usr">usuari</string>
     <string name="input_pwd">contrasenya</string>
     <string name="lbl_usr">Usuari</string>
     <string name="lbl_pwd">Contrasenya</string>
     <string name="btn_login">login</string>
-    <string name="benvingut_user">Benvingut usuari</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="item">Item</string>
-    <string name="item2">Item2</string>
-    <string name="switchAdmin">Soc admin</string>
-    <string name="benvingut_admin">Benvingut admin</string>
     <string name="registre">registre</string>
+    <string name="switchAdmin">Soc admin</string>
+
+    <!--Dash usuari-->
+    <string name="benvingut_user">Benvingut usuari</string>
+
+    <!--Dash admin-->
+    <string name="benvingut_admin">Benvingut admin</string>
+
+    <!--Menu items-->
+    <string name="item">Eliminar compte</string>
+    <string name="item2">Canviar contrasenya</string>
+
+    <!--Pantalla registre-->
+    <string name="pantalla_registre">Pantalla de registre</string>
+    <string name="btn_registrar">Registrar</string>
+    <string name="lbl_usr_reg">Usuari</string>
+    <string name="lbl_mail_reg">Correu</string>
+    <string name="lbl_pass_reg">Contrasenya</string>
+    <string name="tancar_sessio">Tancar sessio</string>
 
 
 </resources>

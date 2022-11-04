@@ -13,8 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kebook"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Registre"></activity>
-        <activity android:name=".DashAdmin" />
+        <activity android:name=".viewControllers.Registre"></activity>
+        <activity android:name=".viewControllers.DashAdmin" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DashUser"
+            android:name=".viewControllers.DashUser"
             android:label="Init usuari"
             android:parentActivityName=".MainActivity">
             <meta-data
