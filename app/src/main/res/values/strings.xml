@@ -3,7 +3,7 @@
     <!--Pantalla login-->
     <string name="input_usr">usuari</string>
     <string name="input_pwd">contrasenya</string>
-    <string name="lbl_usr">Usuari</string>
+    <string name="lbl_email">Correu d\'usuari</string>
     <string name="lbl_pwd">Contrasenya</string>
     <string name="btn_login">login</string>
     <string name="registre">registre</string>
@@ -16,8 +16,14 @@
     <string name="benvingut_admin">Benvingut admin</string>
 
     <!--Menu items-->
-    <string name="item">Eliminar compte</string>
-    <string name="item2">Canviar contrasenya</string>
+    <string name="delete_account">Eliminar compte</string>
+    <string name="change_pass">Canviar contrasenya</string>
+    <string name="admin_tools">Eines admin</string>
+    <string name="comfirm_check_book">Confirmar prèstec</string>
+    <string name="users_info">Info usuaris</string>
+    <string name="confirm_return_book">Confirmar devolucions</string>
+    <string name="book_management">Gestio de llibres</string>
+    <string name="delete_user">Eliminar usuari</string>
 
     <!--Pantalla registre-->
     <string name="pantalla_registre">Pantalla de registre</string>
@@ -26,6 +32,23 @@
     <string name="lbl_mail_reg">Correu</string>
     <string name="lbl_pass_reg">Contrasenya</string>
     <string name="tancar_sessio">Tancar sessio</string>
+    <string name="id">Id</string>
+    <string name="nom">Nom</string>
+    <string name="email">Email</string>
+    <string name="data_creacio">Data de creació</string>
+    <string name="is_admin">Es admin</string>
+    <string name="btn_filter">Filtre</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="btn_delete_user">Eliminar</string>
+    <string name="insereix_la_nova_contrasenya">Insereix la teva contrasenya</string>
+    <string name="btn_apply_filter">Filtrar</string>
+    <string name="by_author">Escritor</string>
+    <string name="by_tittle">Titol</string>
+    <string name="lbl_filter_option">Selecciona el filtre al menu</string>
+    <string name="btn_book_list">Llibres</string>
+    <string name="btn_users_list">Usuaris</string>
+    <string name="btn_add_book">+ Llibre</string>
 
 
 </resources>

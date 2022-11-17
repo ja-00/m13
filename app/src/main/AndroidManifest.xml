@@ -13,7 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kebook"
         android:usesCleartextTraffic="true">
-        <activity android:name=".viewControllers.Registre"></activity>
+        <activity android:name=".viewControllers.BookItem"></activity>
+        <activity android:name=".viewControllers.UserItem" />
+        <activity android:name=".viewControllers.FilterBooks" />
+        <activity android:name=".viewControllers.Registre" />
         <activity android:name=".viewControllers.DashAdmin" />
         <activity android:name=".MainActivity">
             <intent-filter>

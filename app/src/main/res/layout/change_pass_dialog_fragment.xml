@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/insereix_la_nova_contrasenya" />
+
+    <EditText
+        android:id="@+id/newPass1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Contrasenya"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/newPass2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Repeteix contrasenya"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btn_fet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fet" />
+</LinearLayout>

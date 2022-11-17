@@ -25,7 +25,7 @@ import garcia.ioc.kebook.viewControllers.Registre;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private EditText mUser;
+    private EditText mUserEmail;
     private EditText mPass;
     private Button mButtonLogin;
     private Switch mSwitchAdmin;
@@ -35,23 +35,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mUser = findViewById(R.id.inputUser);
+        mUserEmail = findViewById(R.id.inputUser);
         mPass = findViewById(R.id.inputPassword);
         mButtonLogin = findViewById(R.id.buttonLogin);
         mSwitchAdmin = findViewById(R.id.switchAdmin);
     }
+
     /**
-     *
      * @param view Vista del botón Login. android:onClick
-     * @throws ExecutionException
-     * @throws InterruptedException
-     *
-     * Método login. Controlador de la pulsación del botón.
-     * Conecta con el server y resuelve si la conexión ha sido correcta
+     * @throws ExecutionException Excepcion
+     * @throws InterruptedException Método login. Controlador de la pulsación del botón.
+     *                              Conecta con el server y resuelve si la conexión ha sido correcta
      */
     public void login(View view) throws ExecutionException, InterruptedException {
-        // Obtener los String de user y password de los editText y declarar e inicializar las variables
-        String user = mUser.getText().toString();
+        // Obtener los String de userEmail y password de los editText y declarar e inicializar las variables
+        String userEmail = mUserEmail.getText().toString();
         String pass = mPass.getText().toString();
         String jwToken;
         Intent dashUser = new Intent(this, DashUser.class);
@@ -59,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Conexión con el server
         if (mSwitchAdmin.isChecked()) {
-            //jwToken = new LoginAsync().execute(user, pass, "admin").get();
-            jwToken = new AsyncManager().execute("login", user, pass, "admin").get();
+            //jwToken = new LoginAsync().execute(userEmail, pass, "admin").get();
+            jwToken = new AsyncManager().execute("login", userEmail, pass, "admin").get();
             if ((jwToken.toLowerCase().contains("error")) || jwToken.isEmpty()) {
                 showDialogError();
             } else {
@@ -70,14 +68,13 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         } else {
-            //jwToken = new LoginAsync().execute(user, pass, null).get();
-            jwToken = new AsyncManager().execute("login", user, pass, null).get();
+            jwToken = new AsyncManager().execute("login", userEmail, pass, "user").get();
             if ((jwToken.toLowerCase().contains("error")) || jwToken.isEmpty()) {
                 showDialogError();
-
             } else {
                 // Colocar datos para pasar al activity y lanzarlo
                 dashUser.putExtra("token", jwToken);
+                dashUser.putExtra("userEmail", userEmail);
                 startActivity(dashUser);
                 finish();
             }
@@ -106,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("Tornar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Accíón botón Tornar, vuelve a login
-                        Toast.makeText(getApplicationContext(),"Cancelar",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Cancelar", Toast.LENGTH_SHORT).show();
                     }
                 });
         // Crear caja de alerta
