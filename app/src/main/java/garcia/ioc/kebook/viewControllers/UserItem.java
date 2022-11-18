@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +51,9 @@ public class UserItem extends AppCompatActivity {
 
     public void deleteUser(View view) throws ExecutionException, InterruptedException {
             response = new AsyncManager().execute("deleteUser", token, id).get();
-
+            if (response.contains("true")) {
+                Toast.makeText(getApplicationContext(), "El usuario ha sido eliminado", Toast.LENGTH_LONG).show();
+            }
+            finish();
     }
 }

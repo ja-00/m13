@@ -300,7 +300,6 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
             recyclerView.setAdapter(new UserAdapter(users, new UserAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(User item) {
-                    Toast.makeText(getApplicationContext(), "Item pulsado!!!", Toast.LENGTH_LONG).show();
                     Intent userItem = new Intent(getApplicationContext(), UserItem.class);
                     userItem.putExtra("admin_token", token);
                     userItem.putExtra("id", item.getId());
@@ -311,9 +310,6 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
                     userItem.putExtra("fecha_creacion", fecha);
                     userItem.putExtra("es_admin", item.isAdmin());
                     startActivity(userItem);
-
-
-
                 }
             }));
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
