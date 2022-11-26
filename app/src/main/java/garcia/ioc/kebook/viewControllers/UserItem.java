@@ -16,10 +16,10 @@ import garcia.ioc.kebook.models.User;
 
 public class UserItem extends AppCompatActivity {
 
-    String token = null;
-    String id = null;
+    private String token = null;
+    private String id = null;
     private User user = null;
-    String response = null;
+    private String response = null;
     private TextView idView;
     private TextView nameView;
     private TextView emailView;

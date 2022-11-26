@@ -49,4 +49,11 @@
         android:layout_below="@+id/genre_fila"
         android:layout_alignStart="@+id/isbn_fila" />
 
+    <TextView
+        android:id="@+id/reserva_fila"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/available_fila"
+        android:layout_alignStart="@+id/isbn_fila" />
+
 </RelativeLayout>

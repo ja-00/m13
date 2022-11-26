@@ -49,6 +49,20 @@
     <string name="btn_book_list">Llibres</string>
     <string name="btn_users_list">Usuaris</string>
     <string name="btn_add_book">+ Llibre</string>
+    <string name="isbn">ISBN</string>
+    <string name="titulo">Titol</string>
+    <string name="autor">Autor</string>
+    <string name="genero">Gènere</string>
+    <string name="sinopsis">Sinopsis</string>
+    <string name="afegir">Afegir</string>
+    <string name="disponible">Disponible?</string>
+    <string name="btn_book_Book">Reservar</string>
+    <string name="btn_resena">Ressenya</string>
+    <string name="btn_confirm_return">Confir. devolución</string>
+    <string name="btn_confirm_check_out">Confir. reserva</string>
+    <string name="hay_reservas_book">Hay reservas?</string>
+    <string name="resena">Ressenya</string>
+    <string name="btn_publicar_resena">Publicar</string>
 
 
 </resources>

@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kebook"
         android:usesCleartextTraffic="true">
-        <activity android:name=".viewControllers.BookItem"></activity>
+        <activity android:name=".viewControllers.ResenaView"></activity>
+        <activity android:name=".viewControllers.BookItem" />
         <activity android:name=".viewControllers.UserItem" />
         <activity android:name=".viewControllers.FilterBooks" />
         <activity android:name=".viewControllers.Registre" />

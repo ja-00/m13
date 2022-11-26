@@ -43,6 +43,22 @@ public class AsyncManager extends AsyncTask<String, Void, String> {
                 return RequestManager.booksList((strings[1]));
             case "filterBooksList":
                 return RequestManager.filteredBooksList(strings[1], strings[2], strings[3]);
+            case "addBook":
+                return  RequestManager.addBook(strings[1], strings[2], strings[3], strings[4], strings[5], strings[6], strings[7], strings [8]);
+            case "addAuthor":
+                return RequestManager.addAuthor(strings[1], strings[2]);
+            case "getAuthorWithName" :
+                return RequestManager.getAuthorWithName(strings[1], strings[2]);
+            case "getBooksOfBook":
+                return RequestManager.getBooksOfBook(strings[1], strings[2]);
+            case "reservarLibro":
+                return RequestManager.reservarLibro(strings[1], strings[2]);
+            case "confirmarRecogida":
+                return RequestManager.confirmRecogida(strings[1], strings[2]);
+            case "obtenerReservasLibroPorUsuario":
+                return  RequestManager.obtenerReservasLibroPorUsuario(strings[1], strings[2], strings[3]);
+            case "obtenerLibroPorIsbn":
+                return RequestManager.obtenerLibroPorIsbn(strings[1], strings[2]);
             default:
                 return null;
 

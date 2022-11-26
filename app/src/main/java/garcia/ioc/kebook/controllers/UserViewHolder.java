@@ -37,11 +37,12 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
         id.setText("Id d'usuari: " + String.valueOf(user.getId()));
         email.setText("Email: " + user.getCorreo());
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        dateCreation.setText("Data de creació: " + format.format(user.getFecha_creacion()));
+        dateCreation.setText("Data de creació: " + user.getFecha_creacion());
         isAdmin.setText("Es admin?: " + String.valueOf(user.isAdmin()));
 
         itemView.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 listener.onItemClick(user);
             }
         });

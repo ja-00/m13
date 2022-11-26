@@ -1,6 +1,5 @@
 package garcia.ioc.kebook.models;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class User {
@@ -9,7 +8,7 @@ public class User {
     private String nombre;
     private String correo;
     private String contrasena;
-    private Date fecha_creacion;
+    private String fecha_creacion;
     private boolean admin;
 
     public long getId() {
@@ -44,9 +43,9 @@ public class User {
         this.contrasena = contrasena;
     }
 
-    public Date getFecha_creacion() { return fecha_creacion; }
+    public String getFecha_creacion() { return fecha_creacion; }
 
-    public void setFecha_creacion(Date fecha_creacion) {
+    public void setFecha_creacion(String fecha_creacion) {
         this.fecha_creacion = fecha_creacion;
     }
 

@@ -4,7 +4,6 @@ public class Book {
     private String isbn;
     private String titulo;
     private Escritor autor;
-    //private int idAuthor;
     private String sinopsis;
     private String genero;
     private boolean disponible;

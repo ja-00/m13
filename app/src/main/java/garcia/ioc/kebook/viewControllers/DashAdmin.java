@@ -25,7 +25,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import garcia.ioc.kebook.R;
@@ -33,27 +37,30 @@ import garcia.ioc.kebook.controllers.AsyncManager;
 import garcia.ioc.kebook.controllers.BookAdapter;
 import garcia.ioc.kebook.controllers.UserAdapter;
 import garcia.ioc.kebook.models.Book;
+import garcia.ioc.kebook.models.Escritor;
+import garcia.ioc.kebook.models.Reserva;
 import garcia.ioc.kebook.models.User;
 
 /**
  * Clase que crea y gestiona el dashboard del usuario admin
  */
-public class DashAdmin extends AppCompatActivity implements ChangePassDialogFragment.DialogListener {
+public class DashAdmin extends AppCompatActivity implements ChangePassDialogFragment.DialogListener, AddBookDialogFragment.AddBookDialogListener {
 
-    String token = null;
-    String id = null;
+    private String token = null;
+    private String id = null;
     private User user = null;
     private String oldP = null;
-    String response = null;
+    private String response = null;
     private TextView idView;
     private TextView nameView;
     private TextView emailView;
     private TextView dateCreationView;
     private TextView isAdminView;
-    boolean confirm = false;
-    RecyclerView recyclerView = null;
+    private boolean confirm = false;
+    private RecyclerView recyclerView = null;
     private String extraKey = null;
     private String extraValue = null;
+    private String reservasLibro;
 
 
     @Override
@@ -87,8 +94,9 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         emailView = findViewById(R.id.email);
         emailView.setText("Correu: " + user.getCorreo());
         dateCreationView = findViewById(R.id.data_creacio);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        dateCreationView.setText("Data de creació: " + format.format(user.getFecha_creacion()));
+/*        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        dateCreationView.setText("Data de creació: " + format.format(user.getFecha_creacion()));*/
+        dateCreationView.setText("Data de creació: " + user.getFecha_creacion());
         isAdminView = findViewById(R.id.is_admin);
         isAdminView.setText("Es administrador?: " + user.isAdmin());
         // Enlazar con la view (recyclerview) donde se mostrará lista de usuarios
@@ -198,6 +206,8 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         showWarningDialog("Vols sortir de l'aplicació?", "exit");
     }
 
+
+
     /**
      * Cuadro de aviso al pulsar el botón de Atrás del tele´fono
      */
@@ -232,14 +242,39 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         alert.show();
     }
 
-    public void showBooksList(String response) throws ExecutionException, InterruptedException {
+    public void showBooksList(String response) throws InterruptedException {
         Gson gson = new Gson();
         Book[] books;
         if ((response.startsWith("{"))) {
             response = "[" + response + "]";
         }
         books = gson.fromJson(response, Book[].class);
-        recyclerView.setAdapter(new BookAdapter(books));
+
+        recyclerView.setAdapter(new BookAdapter(books, new BookAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Book item) throws ExecutionException, InterruptedException {
+                Intent bookItem = new Intent(getApplicationContext(), BookItem.class);
+                bookItem.putExtra("token", token);
+                bookItem.putExtra("tipo_usuario", "admin");
+                bookItem.putExtra("isbn", item.getIsbn());
+                bookItem.putExtra("titulo", item.getTitulo());
+                bookItem.putExtra("autor", item.getAutor().getNombre());
+                bookItem.putExtra("sinopsis", item.getSinopsis());
+                bookItem.putExtra("genero", item.getGenero());
+                bookItem.putExtra("disponible", String.valueOf(item.isDisponible()));
+                reservasLibro = new AsyncManager().execute("getBooksOfBook", token, item.getIsbn()).get();
+                if (reservasLibro.startsWith("[{")) {
+                    Gson gson = new Gson();
+                    Reserva[] reservas;
+                    reservas = gson.fromJson(reservasLibro, Reserva[].class);
+                    bookItem.putExtra("hay_reservas", "true");
+                    bookItem.putExtra("recogido", String.valueOf(reservas[0].isRecogido()));
+                } /*else {
+                    bookItem.putExtra("hay_reservas", "false");
+                }*/
+                startActivity(bookItem);
+            }
+        }, token));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 ((LinearLayoutManager) recyclerView.getLayoutManager()).getOrientation());
@@ -248,7 +283,7 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
 
     public void filterList(View view) {
         Intent filter = new Intent(this, FilterBooks.class);
-        startActivityForResult(filter,1);
+        startActivityForResult(filter, 1);
         //filterBooksResultLauncher.launch(filter);
     }
 
@@ -265,7 +300,7 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
                     showBooksList(response);
                 } catch (ExecutionException | InterruptedException e) {
                     //e.printStackTrace();
-                    Log.d ("info",  "No se han encontrado resultados");
+                    Log.d("info", "No se han encontrado resultados");
                 }
                 Log.d("Info:", "Key devuelto por el filtro... " + extraKey);
                 Log.d("Info:", "Value devuelto por el filtro... " + extraValue);
@@ -305,9 +340,9 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
                     userItem.putExtra("id", item.getId());
                     userItem.putExtra("nombre", item.getNombre());
                     userItem.putExtra("correo", item.getCorreo());
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                    String fecha = format.format(item.getFecha_creacion());
-                    userItem.putExtra("fecha_creacion", fecha);
+                    //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    //String fecha = format.format(item.getFecha_creacion());
+                    userItem.putExtra("fecha_creacion", item.getFecha_creacion());
                     userItem.putExtra("es_admin", item.isAdmin());
                     startActivity(userItem);
                 }
@@ -326,4 +361,60 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         response = new AsyncManager().execute("booksList", token).get();
         showBooksList(response);
     }
+
+
+    public void onFinishAddBookDialog(String isbn, String title, String autor, String sinopsis, String genre) throws ExecutionException, InterruptedException {
+
+        response = new AsyncManager().execute("getAuthorWithName", token, autor).get();
+        Escritor escritor;
+        // TODO Revisar if vacío
+        if ((response != null && (response.startsWith("{")))) {
+        } else {
+            response = new AsyncManager().execute("addAuthor", token, autor).get();
+        }
+        Gson gson = new Gson();
+        escritor = gson.fromJson(response, Escritor.class);
+
+        response = new AsyncManager().execute("addBook", token, isbn, title, String.valueOf(escritor.getId()), escritor.getNombre(), sinopsis, genre, "true").get();
+        if (response.contains("true")) {
+            Toast.makeText(getApplicationContext(), "Llibre afegit correctament", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "No s'ha pogut afegir el llibre", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void addBook(View view) {
+        AddBookDialogFragment addBookDialogFragment = new AddBookDialogFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+        addBookDialogFragment.setArguments(bundle);
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment previ = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (previ != null) {
+            ft.remove(previ);
+        }
+        ft.addToBackStack(null);
+        addBookDialogFragment.show(ft, "dialog");
+        //addBookDialogFragment.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    }
+
+    protected void onResume() {
+
+        super.onResume();
+        try {
+            response = new AsyncManager().execute("booksList", token).get();
+            showBooksList(response);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+/*    public String getBooksOfBook (String isbn) {
+
+        return null;
+    }*/
 }

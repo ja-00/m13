@@ -1,9 +1,5 @@
 package garcia.ioc.kebook.viewControllers;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +9,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,9 +24,7 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 
@@ -57,7 +50,7 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
     private TextView emailView;
     private TextView dateCreationView;
     private TextView isAdminView;
-    RecyclerView recyclerView = null;
+    private RecyclerView recyclerView = null;
     private String extraKey = null;
     private String extraValue = null;
 
@@ -65,6 +58,7 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dash_user);
+        // TODO Revisar warning
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Kebook");
 
@@ -95,8 +89,9 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
         emailView = findViewById(R.id.email);
         emailView.setText("Correu: " + user.getCorreo());
         dateCreationView = findViewById(R.id.data_creacio);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        dateCreationView.setText("Data de creació: " + format.format(user.getFecha_creacion()));
+        /*SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        dateCreationView.setText("Data de creació: " + format.format(user.getFecha_creacion()));*/
+        dateCreationView.setText("Data de creació: " + user.getFecha_creacion());
         isAdminView = findViewById(R.id.is_admin);
         isAdminView.setText("Es administrador?: " + user.isAdmin());
         // Enlazar con la view (recyclerview) donde se mostrará lista de libros
@@ -109,7 +104,7 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
             e.printStackTrace();
         }
 
-        Toast.makeText(getApplicationContext(), "Benvingut usuari", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Benvingut usuari", Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -244,7 +239,21 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
             response = "[" + response + "]";
         }
         books = gson.fromJson(response, Book[].class);
-        recyclerView.setAdapter(new BookAdapter(books));
+        recyclerView.setAdapter(new BookAdapter(books, new BookAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Book item) {
+                Intent bookItem = new Intent(getApplicationContext(), BookItem.class);
+                bookItem.putExtra("token", token);
+                bookItem.putExtra("tipo_usuario", "user");
+                bookItem.putExtra("isbn", item.getIsbn());
+                bookItem.putExtra("titulo", item.getTitulo());
+                bookItem.putExtra("autor", item.getAutor().getNombre());
+                bookItem.putExtra("sinopsis", item.getSinopsis());
+                bookItem.putExtra("genero", item.getGenero());
+                bookItem.putExtra("disponible", String.valueOf(item.isDisponible()));
+                startActivity(bookItem);
+            }
+        }, token));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 ((LinearLayoutManager) recyclerView.getLayoutManager()).getOrientation());
