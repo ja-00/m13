@@ -35,13 +35,8 @@ public class Registre extends AppCompatActivity {
         String mail = mMail.getText().toString();
         String pass = mPass.getText().toString();
 
-        //String response = new RegistreAsync().execute(user, mail, pass).get();
         String response = new AsyncManager().execute("register", user, mail, pass).get();
 
-        //jwToken = new LoginAsync().execute(user, pass, "admin").get();
-
-
-        Log.d("Info", "En registre Token rebut: " + response);
         Toast.makeText(getApplicationContext(),"Usuari registrat correctament",Toast.LENGTH_SHORT).show();
         finish();
     }

@@ -32,12 +32,13 @@ import garcia.ioc.kebook.R;
 import garcia.ioc.kebook.controllers.AsyncManager;
 import garcia.ioc.kebook.controllers.BookAdapter;
 import garcia.ioc.kebook.models.Book;
+import garcia.ioc.kebook.models.Reserva;
 import garcia.ioc.kebook.models.User;
 
 /**
  * Clase que crea y controla el dashboard del usuario
  */
-public class DashUser extends AppCompatActivity implements ChangePassDialogFragment.DialogListener{
+public class DashUser extends AppCompatActivity implements ChangePassDialogFragment.DialogListener {
     private String token = null;
     private String id = null;
     private String oldP = null;
@@ -53,6 +54,7 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
     private RecyclerView recyclerView = null;
     private String extraKey = null;
     private String extraValue = null;
+    private String reservasLibro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,9 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
         return true;
     }
 
+    /**
+     * Acción para cada caso del menú superior
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -173,6 +178,9 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
         return true;
     }
 
+    /**
+     * Obtener id del token recibido
+     */
     public String getIdFromToken(String token) {
         String[] splitToken = token.split("\\.");
 
@@ -232,6 +240,9 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
         alert.show();
     }
 
+    /**
+     * Muestra la lista de libros usando recyclerView
+     */
     public void showBooksList(String response) {
         Gson gson = new Gson();
         Book[] books;
@@ -239,9 +250,11 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
             response = "[" + response + "]";
         }
         books = gson.fromJson(response, Book[].class);
+
+        // Muestra la lista usando recyclerview
         recyclerView.setAdapter(new BookAdapter(books, new BookAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Book item) {
+            public void onItemClick(Book item) throws ExecutionException, InterruptedException {
                 Intent bookItem = new Intent(getApplicationContext(), BookItem.class);
                 bookItem.putExtra("token", token);
                 bookItem.putExtra("tipo_usuario", "user");
@@ -251,7 +264,17 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
                 bookItem.putExtra("sinopsis", item.getSinopsis());
                 bookItem.putExtra("genero", item.getGenero());
                 bookItem.putExtra("disponible", String.valueOf(item.isDisponible()));
-                startActivity(bookItem);
+                reservasLibro = new AsyncManager().execute("obtenerReservasPorLibro", token, item.getIsbn()).get();
+                if (reservasLibro.startsWith("[{")) {
+                    Gson gson = new Gson();
+                    Reserva[] reservas;
+                    reservas = gson.fromJson(reservasLibro, Reserva[].class);
+                    bookItem.putExtra("hay_reservas", "true");
+                    bookItem.putExtra("recogido", String.valueOf(reservas[0].isRecogido()));
+                } else {
+                    bookItem.putExtra("hay_reservas", "false");
+                }
+                startActivityForResult(bookItem, 2);
             }
         }, token));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -260,15 +283,21 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
+    /**
+     * Lanza nuevo intent para filtrar lista de libros
+     */
     public void filterList(View view) {
         Intent filter = new Intent(this, FilterBooks.class);
-        startActivityForResult(filter,1);
+        startActivityForResult(filter, 1);
         //filterBooksResultLauncher.launch(filter);
     }
 
+    /**
+     * Acciones a realizar según los valores devueltos por el intent de filtrado de libros
+     * o bien al volver a la pantalla de lista
+     */
     @Override
-    public void onActivityResult(int requestCode,
-                                 int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
@@ -279,13 +308,24 @@ public class DashUser extends AppCompatActivity implements ChangePassDialogFragm
                     showBooksList(response);
                 } catch (ExecutionException | InterruptedException e) {
                     //e.printStackTrace();
-                    Log.d ("info",  "No se han encontrado resultados");
+                    Log.d("info", "No se han encontrado resultados");
                 }
                 Log.d("Info:", "Key devuelto por el filtro... " + extraKey);
                 Log.d("Info:", "Value devuelto por el filtro... " + extraValue);
             }
+        } else if (requestCode == 2) {
+            try {
+                response = new AsyncManager().execute("booksList", token).get();
+                showBooksList(response);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
+
+    /**
+     * Acciones a realizar al finalizar el diálogo para cambiar contraseña
+     */
     @Override
     public void onFinishEditDialog(String pass1, String pass2) throws ExecutionException, InterruptedException {
         if (pass1.equals(pass2)) {

@@ -1,7 +1,12 @@
 package garcia.ioc.kebook.controllers;
 
 import android.os.AsyncTask;
-import android.util.Log;
+
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 public class AsyncManager extends AsyncTask<String, Void, String> {
 
@@ -19,13 +24,20 @@ public class AsyncManager extends AsyncTask<String, Void, String> {
     }*/
     @Override
     protected String doInBackground(String... strings) {
-        Log.d("Info", "Dentro de AsyncManager.doinbackground");
         switch (strings[0]) {
             case "login":
                 if (strings[3].equals("admin")) {
-                    return RequestManager.login(strings[1], strings[2], true);
+                    try {
+                        return RequestManager.login(strings[1], strings[2], true);
+                    } catch (IOException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException | CertificateException e) {
+                        e.printStackTrace();
+                    }
                 } else if (strings[3].equals("user")) {
-                    return RequestManager.login(strings[1], strings[2], false);
+                    try {
+                        return RequestManager.login(strings[1], strings[2], false);
+                    } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+                        e.printStackTrace();
+                    }
                 }
             case "register":
                 return RequestManager.registerUser(strings[1], strings[2], strings[3]);
@@ -49,16 +61,22 @@ public class AsyncManager extends AsyncTask<String, Void, String> {
                 return RequestManager.addAuthor(strings[1], strings[2]);
             case "getAuthorWithName" :
                 return RequestManager.getAuthorWithName(strings[1], strings[2]);
-            case "getBooksOfBook":
-                return RequestManager.getBooksOfBook(strings[1], strings[2]);
+            case "obtenerReservasPorLibro":
+                return RequestManager.obtenerReservasPorLibro(strings[1], strings[2]);
             case "reservarLibro":
                 return RequestManager.reservarLibro(strings[1], strings[2]);
             case "confirmarRecogida":
-                return RequestManager.confirmRecogida(strings[1], strings[2]);
+                return RequestManager.confirmarRecogida(strings[1], strings[2]);
+            case "confirmarDevolucion":
+                return RequestManager.confirmarDevolucion(strings[1], strings[2]);
             case "obtenerReservasLibroPorUsuario":
                 return  RequestManager.obtenerReservasLibroPorUsuario(strings[1], strings[2], strings[3]);
             case "obtenerLibroPorIsbn":
                 return RequestManager.obtenerLibroPorIsbn(strings[1], strings[2]);
+            case "guardarResena":
+                return RequestManager.guardarResena(strings[1], strings[2]);
+            case "guardarEvento":
+                return RequestManager.guardarEvento(strings[1], strings[2]);
             default:
                 return null;
 

@@ -112,6 +112,19 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         Toast.makeText(getApplicationContext(), "Benvingut Administrador", Toast.LENGTH_SHORT).show();
     }
 
+    /** Al volver a este activity se vuelve a hacer una peticion al server para refrescar la lista de libros por si ha habido cambios*/
+    protected void onResume() {
+
+        super.onResume();
+        try {
+            response = new AsyncManager().execute("booksList", token).get();
+            showBooksList(response);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     /**
      * Menú para el dashboard
      *
@@ -124,6 +137,9 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         return true;
     }
 
+    /**
+     * Acción para cada caso del menú superior
+     */
     @Override/**/
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -178,6 +194,9 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         return true;
     }
 
+    /**
+     * Obtener id del token recibido
+     */
     public String getIdFromToken(String token) {
         String[] splitToken = token.split("\\.");
 
@@ -198,15 +217,13 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
     }
 
     /**
-     * Si se pulsa el botón de Atràs en el teléfono
+     * Acción si se pulsa el botón de Atràs en el teléfono
      */
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
         showWarningDialog("Vols sortir de l'aplicació?", "exit");
     }
-
-
 
     /**
      * Cuadro de aviso al pulsar el botón de Atrás del tele´fono
@@ -242,6 +259,9 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         alert.show();
     }
 
+    /**
+     * Muestra la lista de libros usando un recyclerView
+     */
     public void showBooksList(String response) throws InterruptedException {
         Gson gson = new Gson();
         Book[] books;
@@ -262,7 +282,7 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
                 bookItem.putExtra("sinopsis", item.getSinopsis());
                 bookItem.putExtra("genero", item.getGenero());
                 bookItem.putExtra("disponible", String.valueOf(item.isDisponible()));
-                reservasLibro = new AsyncManager().execute("getBooksOfBook", token, item.getIsbn()).get();
+                reservasLibro = new AsyncManager().execute("obtenerReservasPorLibro", token, item.getIsbn()).get();
                 if (reservasLibro.startsWith("[{")) {
                     Gson gson = new Gson();
                     Reserva[] reservas;
@@ -275,18 +295,26 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
                 startActivity(bookItem);
             }
         }, token));
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 ((LinearLayoutManager) recyclerView.getLayoutManager()).getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
+    /**
+     * Lanza nuevo intent para filtrar lista de libros
+     */
     public void filterList(View view) {
         Intent filter = new Intent(this, FilterBooks.class);
         startActivityForResult(filter, 1);
         //filterBooksResultLauncher.launch(filter);
     }
 
+    /**
+     * Acciones a realizar según los valores devueltos por el intent de filtrado de libros
+     * o bien al volver a la pantalla de lista
+     */
     @Override
     public void onActivityResult(int requestCode,
                                  int resultCode, Intent data) {
@@ -308,6 +336,9 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         }
     }
 
+    /**
+     * Acciones a realizar al finalizar el diálogo para cambiar contraseña
+     */
     public void onFinishEditDialog(String pass1, String pass2) throws ExecutionException, InterruptedException {
         if (pass1.equals(pass2)) {
             response = new AsyncManager().execute("getUserWithId", token, id).get();
@@ -326,6 +357,7 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
 
     }
 
+    /** Handler del botón que muestra la lista de usuarios*/
     public void usersList(View view) {
         try {
             response = new AsyncManager().execute("usersList", token).get();
@@ -357,12 +389,31 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         }
     }
 
+    /** Handler del botón que muestra la lista de libros*/
     public void booksList(View view) throws ExecutionException, InterruptedException {
         response = new AsyncManager().execute("booksList", token).get();
         showBooksList(response);
     }
 
+    /** Handler del botón que permite añadir libros*/
+    public void addBook(View view) {
+        AddBookDialogFragment addBookDialogFragment = new AddBookDialogFragment();
 
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+        addBookDialogFragment.setArguments(bundle);
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment previ = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (previ != null) {
+            ft.remove(previ);
+        }
+        ft.addToBackStack(null);
+        addBookDialogFragment.show(ft, "dialog");
+        //addBookDialogFragment.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    }
+
+    /** Acciones a realizar al cerrar el dialogo de añadir libro*/
     public void onFinishAddBookDialog(String isbn, String title, String autor, String sinopsis, String genre) throws ExecutionException, InterruptedException {
 
         response = new AsyncManager().execute("getAuthorWithName", token, autor).get();
@@ -383,38 +434,4 @@ public class DashAdmin extends AppCompatActivity implements ChangePassDialogFrag
         }
     }
 
-    public void addBook(View view) {
-        AddBookDialogFragment addBookDialogFragment = new AddBookDialogFragment();
-
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("notAlertDialog", true);
-        addBookDialogFragment.setArguments(bundle);
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment previ = getSupportFragmentManager().findFragmentByTag("dialog");
-        if (previ != null) {
-            ft.remove(previ);
-        }
-        ft.addToBackStack(null);
-        addBookDialogFragment.show(ft, "dialog");
-        //addBookDialogFragment.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    }
-
-    protected void onResume() {
-
-        super.onResume();
-        try {
-            response = new AsyncManager().execute("booksList", token).get();
-            showBooksList(response);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-/*    public String getBooksOfBook (String isbn) {
-
-        return null;
-    }*/
 }

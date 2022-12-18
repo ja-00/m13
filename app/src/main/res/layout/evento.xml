@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".viewControllers.ResenaView">
+    tools:context=".viewControllers.EventoView">
 
     <TextView
         android:id="@+id/titulo_book"
@@ -38,37 +38,27 @@
         tools:layout_editor_absoluteY="260dp"
         tools:visibility="visible" />
 
-    <TextView
-        android:id="@+id/resena"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="@string/resena"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/titulo_book"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.172" />
-
     <EditText
-        android:id="@+id/edit_text_resena"
-        android:layout_width="381dp"
-        android:layout_height="210dp"
-        android:ems="10"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
+        android:id="@+id/etPlannedDate"
+        android:layout_width="277dp"
+        android:layout_height="68dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="date"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.466"
+        app:layout_constraintHorizontal_bias="0.417"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.293" />
+        app:layout_constraintVertical_bias="0.193" />
 
     <Button
-        android:id="@+id/btn_publicar_resena"
+        android:id="@+id/btn_select_fecha_evento"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btn_publicar_resena"
-        android:onClick="publicarResena"
+        android:text="@string/btn_select_fecha_evento"
+        android:onClick="propuestaFechaEvento"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

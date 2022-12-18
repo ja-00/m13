@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -11,9 +13,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Kebook"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".viewControllers.ResenaView"></activity>
+        android:theme="@style/Theme.Kebook">
+        <activity android:name=".viewControllers.EventoView"></activity>
+        <activity android:name=".viewControllers.ResenaView" />
         <activity android:name=".viewControllers.BookItem" />
         <activity android:name=".viewControllers.UserItem" />
         <activity android:name=".viewControllers.FilterBooks" />

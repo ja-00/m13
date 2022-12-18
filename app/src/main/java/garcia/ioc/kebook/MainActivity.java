@@ -2,9 +2,13 @@ package garcia.ioc.kebook;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
     private Button mButtonLogin;
     private Switch mSwitchAdmin;
 
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,11 +50,13 @@ public class MainActivity extends AppCompatActivity {
         mPass = findViewById(R.id.inputPassword);
         mButtonLogin = findViewById(R.id.buttonLogin);
         mSwitchAdmin = findViewById(R.id.switchAdmin);
+
+        verifyStoragePermissions(this);
     }
 
     /**
      * @param view Vista del botón Login. android:onClick
-     * @throws ExecutionException Excepcion
+     * @throws ExecutionException   Excepcion
      * @throws InterruptedException Método login. Controlador de la pulsación del botón.
      *                              Conecta con el server y resuelve si la conexión ha sido correcta
      */
@@ -121,5 +134,30 @@ public class MainActivity extends AppCompatActivity {
         Intent registre = new Intent(this, Registre.class);
         startActivity(registre);
     }
+
+    // For API 23+ you need to request the read/write permissions even if they are already in your manifest.
+
+
+    /**
+     * Checks if the app has permission to write to device storage
+     * <p>
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
 }
 

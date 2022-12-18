@@ -43,7 +43,7 @@ public class BookViewHolder extends RecyclerView.ViewHolder {
         synopsis.setText("Sinopsi: " + book.getSinopsis());
         genre.setText("Gènere: " + book.getGenero());
         available.setText("Disponible: " + String.valueOf(book.isDisponible()));
-        reservasLibro = new AsyncManager().execute("getBooksOfBook", token, book.getIsbn()).get();
+        reservasLibro = new AsyncManager().execute("obtenerReservasPorLibro", token, book.getIsbn()).get();
         if (reservasLibro.startsWith("[{")) {
             this.reserva.setText("Hay reservas?: " + "true");
         } else {

@@ -1,30 +1,29 @@
 package garcia.ioc.kebook.viewControllers;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
 import java.util.Base64;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 import garcia.ioc.kebook.R;
 import garcia.ioc.kebook.controllers.AsyncManager;
 import garcia.ioc.kebook.models.Book;
-import garcia.ioc.kebook.models.Escritor;
+import garcia.ioc.kebook.models.Evento;
+import garcia.ioc.kebook.models.Resena;
 import garcia.ioc.kebook.models.Reserva;
 import garcia.ioc.kebook.models.User;
 
@@ -45,12 +44,21 @@ public class BookItem extends AppCompatActivity {
     private TextView disponibleView;
     private Button reservar;
     private Button confirmDevol;
-    private Button confirmReserv;
+    private Button confirmRecogi;
     private Button eliminarLibro;
-    private Button resena;
+    private Button resenaButton;
+    private Button propEvento;
     private boolean available = false;
     private TextView hayReservas;
-    private Reserva reserva = null;
+    private String reservasPorLibro = null;
+    private String textResena = null;
+    private String fechaPropuesta = null;
+
+    JSONObject reservaObject = new JSONObject();
+    JSONObject userObject = new JSONObject();
+    JSONObject bookObject = new JSONObject();
+    JSONObject autorObject = new JSONObject();
+    JSONObject eventoObject = new JSONObject();
 
 
     @Override
@@ -76,28 +84,43 @@ public class BookItem extends AppCompatActivity {
         disponibleView.setText("Disponible: " + getIntent().getStringExtra("disponible"));
         hayReservas.setText("Hay reservas?: " + getIntent().getStringExtra("hay_reservas"));
 
-
         reservar = findViewById(R.id.btn_book_book);
         confirmDevol = findViewById(R.id.btn_confirm_return);
-        confirmReserv = findViewById(R.id.btn_confirm_check_out);
+        confirmRecogi = findViewById(R.id.btn_confirm_check_out);
         //eliminarLibro = findViewById(R.id.btn_resena);
-        resena = findViewById(R.id.btn_resena);
+        resenaButton = findViewById(R.id.btn_resena);
+        propEvento = findViewById(R.id.btn_proponer_evento);
 
         userType = getIntent().getStringExtra("tipo_usuario");
 
         if (userType.contains("admin")) {
-            eliminarLibro.setVisibility(View.GONE);
+            resenaButton.setVisibility(View.GONE);
             reservar.setVisibility(View.GONE);
-            if ((getIntent().getStringExtra("disponible").contains("true"))) {
+            propEvento.setVisibility(View.GONE);
+            try {
+                reservasPorLibro = new AsyncManager().execute("obtenerReservasPorLibro", token, getIntent().getStringExtra("isbn")).get();
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (getIntent().getStringExtra("disponible").contains("true")) {
                 confirmDevol.setAlpha(.5f);
                 confirmDevol.setClickable(false);
-            }
-            if (!((getIntent().getStringExtra("disponible").contains("true")) && (getIntent().getStringExtra("hay_reservas").contains("true"))) || (getIntent().getStringExtra("recogido").contains("true"))) {
-                confirmReserv.setAlpha(.5f);
-                confirmReserv.setClickable(false);
+                confirmRecogi.setAlpha(.5f);
+                confirmRecogi.setClickable(false);
+            } else if (!(reservasPorLibro.contains("null")) && (reservasPorLibro.startsWith("[{"))) {
+                Gson gson = new Gson();
+                Reserva[] reservas = gson.fromJson(reservasPorLibro, Reserva[].class);
+                if (reservas[reservas.length - 1].isRecogido() && !reservas[reservas.length - 1].isDevuelto() && (reservas[0] != null)) {
+                    confirmRecogi.setAlpha(.5f);
+                    confirmRecogi.setClickable(false);
+                }
+                if (!reservas[reservas.length - 1].isRecogido() && !reservas[reservas.length - 1].isDevuelto() && (reservas[0] != null)) {
+                    confirmDevol.setAlpha(.5f);
+                    confirmDevol.setClickable(false);
+                }
             }
         } else if (userType.contains("user")) {
-            confirmReserv.setVisibility(View.GONE);
+            confirmRecogi.setVisibility(View.GONE);
             confirmDevol.setVisibility(View.GONE);
             if (getIntent().getStringExtra("disponible").contains("false")) {
                 reservar.setAlpha(.5f);
@@ -108,14 +131,22 @@ public class BookItem extends AppCompatActivity {
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
-            // TODO Revisar Warning de comparar strings !=
-            if ((hayReservasDeEsteUsuario != "null") && ((hayReservasDeEsteUsuario.startsWith("[")) || (hayReservasDeEsteUsuario.startsWith("[")))) {
+            // Si no hay reserva el servidor devuelve para hayReservasDeEsteUsuario --> "[]\"
+            //if (!(hayReservasDeEsteUsuario.contains("null")) && ((hayReservasDeEsteUsuario.startsWith("[")) || (hayReservasDeEsteUsuario.startsWith("[{")))) {
+            if (!(hayReservasDeEsteUsuario.contains("null")) && (hayReservasDeEsteUsuario.startsWith("[{"))) {
                 Gson gson = new Gson();
                 Reserva[] reservas = gson.fromJson(hayReservasDeEsteUsuario, Reserva[].class);
-                if (!(reservas[0].isRecogido()) && (reservas[0] != null)) {
-                    resena.setAlpha(.5f);
-                    resena.setClickable(false);
+                if (!(reservas[reservas.length - 1].isDevuelto()) && (reservas[0] != null)) {
+                    reservar.setAlpha(.5f);
+                    reservar.setClickable(false);
                 }
+                if (!(reservas[0].isRecogido()) && (reservas[0] != null)) {
+                    resenaButton.setAlpha(.5f);
+                    resenaButton.setClickable(false);
+                }
+            } else if (!(hayReservasDeEsteUsuario.contains("null")) && (hayReservasDeEsteUsuario.startsWith("[]"))) {
+                resenaButton.setAlpha(.5f);
+                resenaButton.setClickable(false);
             }
         }
     }
@@ -129,30 +160,33 @@ public class BookItem extends AppCompatActivity {
         return available;
     }
 
-    public void confirmarDevolucion(View view) {
-    }
-
-    public void confirmarPrestamo(View view) throws ExecutionException, InterruptedException {
-        response = new AsyncManager().execute("getBooksOfBook", token, getIntent().getStringExtra("isbn")).get();
+    public void confirmarDevolucion(View view) throws ExecutionException, InterruptedException {
+        response = new AsyncManager().execute("obtenerReservasPorLibro", token, getIntent().getStringExtra("isbn")).get();
         Reserva[] reservas;
         Gson gson = new Gson();
         reservas = gson.fromJson(response, Reserva[].class);
-        // TODO Revisar Warning de getId
-        reservas[0].getId();
-        response = new AsyncManager().execute("confirmarRecogida", token, String.valueOf(reservas[0].getId())).get();
+        response = new AsyncManager().execute("confirmarDevolucion", token, String.valueOf(reservas[reservas.length - 1].getId())).get();
         finish();
     }
 
+    public void confirmarRecogida(View view) throws ExecutionException, InterruptedException {
+        response = new AsyncManager().execute("obtenerReservasPorLibro", token, getIntent().getStringExtra("isbn")).get();
+        Reserva[] reservas;
+        Gson gson = new Gson();
+        reservas = gson.fromJson(response, Reserva[].class);
+        response = new AsyncManager().execute("confirmarRecogida", token, String.valueOf(reservas[reservas.length - 1].getId())).get();
+        finish();
+    }
 
     public void reservarLibro(View view) throws ExecutionException, InterruptedException, JSONException {
-        reserva = new Reserva();
+        //Reserva reserva = new Reserva();
         response = new AsyncManager().execute("getUserWithId", token, getIdFromToken(token)).get();
         Gson gson = new Gson();
         user = gson.fromJson(response, User.class);
         response = new AsyncManager().execute("obtenerLibroPorIsbn", token, getIntent().getStringExtra("isbn")).get();
         book = gson.fromJson(response, Book.class);
-        JSONObject reservaObject = new JSONObject();
-        JSONObject userObject = new JSONObject();
+        //reservaObject = new JSONObject();
+        //userObject = new JSONObject();
         userObject.put("id", user.getId());
         userObject.put("nombre", user.getNombre());
         userObject.put("correo", user.getCorreo());
@@ -160,10 +194,10 @@ public class BookItem extends AppCompatActivity {
         userObject.put("fecha_creacion", user.getFecha_creacion());
         userObject.put("admin", String.valueOf(user.isAdmin()));
         reservaObject.put("usuario", userObject);
-        JSONObject bookObject = new JSONObject();
+        //bookObject = new JSONObject();
         bookObject.put("isbn", book.getIsbn());
         bookObject.put("titulo", book.getTitulo());
-        JSONObject autorObject = new JSONObject();
+        //autorObject = new JSONObject();
         autorObject.put("nombre", book.getAutor().getNombre());
         bookObject.put("autor", autorObject);
         bookObject.put("sinopsis", book.getSinopsis());
@@ -172,8 +206,8 @@ public class BookItem extends AppCompatActivity {
         reservaObject.put("libro", bookObject);
         LocalDate localDate;
         localDate = LocalDate.now();
-        reservaObject.put("fecha_inicio",localDate.toString());
-        reservaObject.put("fecha_fin",localDate.toString());
+        reservaObject.put("fecha_inicio", localDate.toString());
+        reservaObject.put("fecha_fin", localDate.toString());
         reservaObject.put("devuelto", "false");
         reservaObject.put("recogido", "false");
 
@@ -181,10 +215,12 @@ public class BookItem extends AppCompatActivity {
 
         response = new AsyncManager().execute("reservarLibro", token, reservaJson).get();
         if ((response.contains("200"))) {
+
             Toast.makeText(getApplicationContext(), "Reserva realizada correctamente", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getApplicationContext(), "No se ha podido realizar la reserva", Toast.LENGTH_LONG).show();
         }
+        finish();
     }
 
     public String getIdFromToken(String token) {
@@ -194,7 +230,6 @@ public class BookItem extends AppCompatActivity {
 
         String header = new String(decoder.decode(splitToken[0]));
         String payload = new String(decoder.decode(splitToken[1]));
-        Log.d("Info: ", "Payload del recibido por el activity dashUser: " + payload);
         Gson JSONPayload = new Gson();
         JSONObject jsonObject;
         try {
@@ -206,12 +241,67 @@ public class BookItem extends AppCompatActivity {
         return id;
     }
 
-    public void resena(View view) {
-        Intent resena = new Intent(getApplicationContext(), ResenaView.class);
-        resena.putExtra("libro", getIntent().getStringExtra("titulo"));
-        resena.putExtra("autor", getIntent().getStringExtra("autor"));
-        startActivity(resena);
+    public void resenaLibro(View view) throws ExecutionException, InterruptedException, JSONException {
+        Intent resenaActivity = new Intent(getApplicationContext(), ResenaView.class);
+        resenaActivity.putExtra("token", token);
+        resenaActivity.putExtra("isbn", getIntent().getStringExtra("isbn"));
+        startActivity(resenaActivity);
         finish();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+/*        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                textResena = data.getStringExtra("text_resena");
+            }
+        }*/
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+
+                fechaPropuesta = data.getStringExtra("fecha_propuesta");
+
+                try {
+                    response = new AsyncManager().execute("getUserWithId", token, getIdFromToken(token)).get();
+                    Gson gson = new Gson();
+                    user = gson.fromJson(response, User.class);
+                    response = new AsyncManager().execute("obtenerLibroPorIsbn", token, getIntent().getStringExtra("isbn")).get();
+                    book = gson.fromJson(response, Book.class);
+                    userObject.put("id", user.getId());
+                    userObject.put("nombre", user.getNombre());
+                    userObject.put("correo", user.getCorreo());
+                    userObject.put("contrasena", user.getContrasena());
+                    userObject.put("fecha_creacion", user.getFecha_creacion());
+                    userObject.put("admin", String.valueOf(user.isAdmin()));
+                    eventoObject.put("proponente", userObject);
+                    bookObject.put("isbn", book.getIsbn());
+                    bookObject.put("titulo", book.getTitulo());
+                    autorObject.put("nombre", book.getAutor().getNombre());
+                    bookObject.put("autor", autorObject);
+                    bookObject.put("sinopsis", book.getSinopsis());
+                    bookObject.put("genero", book.getGenero());
+                    bookObject.put("disponible", String.valueOf(book.isDisponible()));
+                    eventoObject.put("libro", bookObject);
+                    eventoObject.put("fecha", fechaPropuesta);
+
+                    String eventoJson = eventoObject.toString();
+                    response = new AsyncManager().execute("guardarEvento", token, eventoJson).get();
+                } catch (ExecutionException | InterruptedException | JSONException e) {
+                    e.printStackTrace();
+                }
+
+/*                String returnedResult = data.getData().toString();
+                // OR
+                // String returnedResult = data.getDataString();*/
+            }
+        }
+    }
+
+    public void proponerEvento(View view) {
+        Intent eventoActivity = new Intent(getApplicationContext(), EventoView.class);
+        eventoActivity.putExtra("titulo", getIntent().getStringExtra("titulo"));
+        eventoActivity.putExtra("autor", getIntent().getStringExtra("autor"));
+        startActivityForResult(eventoActivity, 2);
     }
 
 
